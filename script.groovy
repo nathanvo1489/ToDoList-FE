@@ -7,7 +7,7 @@ pipeline {
                 git branch: 'main', credentialsId: 'jenkins-github-login' ,url: 'https://github.com/nathanvo1489/ToDoList-FE.git'
             }
         }
-
+        //// CI ////
         // must build with prefix username to push to Dockerhub
         stage('Build Docker Image') {
             steps {
@@ -32,6 +32,21 @@ pipeline {
                 sh '''
                     docker push nathanvo1489/js_react_fe_image:latest
                 '''
+            }
+        }
+
+        //// CD in server run ////
+        stage('Deploy Container') {
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId:'ssh-login', keyFileVariable:'SSH_KEY', usernameVariable:'SSH_USER'),
+                    string(credentialsId:'ip-server-run', variable:'IP_SERVER_RUN')
+                ]) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${IP_SERVER_RUN}
+                        ls -la
+                    '''
+                }
             }
         }
 
