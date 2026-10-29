@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout Frontend Code') {
             steps {
-                git branch: 'main', credentialsId: 'jenkins-github-login' ,url: 'https://github.com/nathanvo1489/ToDoList-FE.git'
+                git branch: 'main',
+                credentialsId: 'jenkins-github-login',
+                url: 'https://github.com/nathanvo1489/ToDoList-FE.git'
             }
         }
         //// CI ////
@@ -18,7 +20,10 @@ pipeline {
         stage('Dockerhub Login') {
             steps {
                 withCredentials([
-                    usernamePassword(credentialsId:'jenkins-dockerhub-login', usernameVariable:'DOCKER_USER', passwordVariable:'DOCKER_PASS')
+                    usernamePassword(
+                        credentialsId:'jenkins-dockerhub-login',
+                        usernameVariable:'DOCKER_USER',
+                        passwordVariable:'DOCKER_PASS')
                 ]) {
                     sh '''
                         docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
@@ -36,15 +41,28 @@ pipeline {
         }
 
         //// CD in server run ////
+        // Rmb to check docker-compose.yml & .env file at the newest version //
         stage('Deploy Container') {
             steps {
                 withCredentials([
-                    sshUserPrivateKey(credentialsId:'ssh-login', keyFileVariable:'SSH_KEY', usernameVariable:'SSH_USER'),
-                    string(credentialsId:'ip-server-run', variable:'IP_SERVER_RUN')
+                    sshUserPrivateKey(
+                        credentialsId:'ssh-login',
+                        keyFileVariable:'SSH_KEY',
+                        usernameVariable:'SSH_USER'),
+                    string(
+                        credentialsId:'ip-server-run-fe',
+                        variable:'IP_SERVER_RUN_FE')
                 ]) {
+                    // must manually docker login in server run
+                    // after ls -la -> docker login -u nathanvo1489 -p (copy pass in 'jenkins-dockerhub-login')
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${IP_SERVER_RUN}
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${IP_SERVER_RUN_FE}
                         ls -la
+
+                        cd /home/ubuntu/ToDoList-FE/docker-compose/
+                        docker compose pull js_react_fe
+                        docker compose up -d --force-recreate js_react_fe
+                        docker image prune -f
                     '''
                 }
             }

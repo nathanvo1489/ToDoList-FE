@@ -1,0 +1,78 @@
+services:
+  # docker run --name mongodb -d -v mongo_data:/data/db -v mongo_config:/data/configdb -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=12345 -p 27017:27017 mongo:latest
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=12345
+    # Healthcheck to ensure MongoDB is ready before starting backend services
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  # docker run --name js_express_be_container -d -p 8000:8001 --env-file=.env js_express_be_image
+  js_express_be:
+    # build:
+    #   context: ../backend
+    #   dockerfile: Dockerfile
+    #---Must build with username in order to push to DockerHub---#
+    image: nathanvo1489/js_express_be_image:latest
+    container_name: js_express_be
+    ports:
+      - 8000:8001
+    env_file:
+      - ../.env
+    depends_on:
+      # mongodb must be healthy before starting the backend service
+      mongodb:
+        condition: service_healthy
+
+  # docker run --name js_react_fe_container -d -p 3001:80 js_react_fe_image
+  js_react_fe:
+    # build:
+    #   context: ../frontend
+    #   dockerfile: Dockerfile
+    #---Must build with username in order to push to DockerHub---#
+    image: nathanvo1489/js_react_fe_image:latest
+    container_name: js_react_fe
+    ports:
+      - 3001:80
+    depends_on:
+      - js_express_be
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   ports:
+  #     - 9090:9090
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   ports:
+  #     - 3001:3000
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=12345
+
+volumes:
+  mongo_data:
+    name: mongo_data
+  # mongo_config:
+  #   external: true
+  #   name: 65367d885df17492ca8dc70f0d49191066a613183a2e6cbfb758a10a9c86c606
+  # grafana_data:
+
+

@@ -68,3 +68,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Jenkins FE/BE pipeline
+
+Create one Jenkins Pipeline job and set its script path to
+`script-combined.groovy`. Choose `FE` or `BE` for the `APP` parameter when
+starting a build. The pipeline selects that app's repository, Docker image,
+Compose service, and server IP credential, then checks out `main`, builds and
+pushes the image, and deploys the selected service from
+`/home/ubuntu/Proj_ToDoList/docker-compose/`.
+
+The Jenkins instance must have the credentials `jenkins-github-login`,
+`jenkins-dockerhub-login`, `ssh-login`, `ip-server-run` (FE server IP), and
+`ip-server-run-be` (BE server IP) configured. The remote Compose file must
+define both `js_react_fe` and `js_express_be` services.
