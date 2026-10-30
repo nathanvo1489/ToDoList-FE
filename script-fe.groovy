@@ -56,13 +56,13 @@ pipeline {
                     // must manually docker login in server run
                     // after ls -la -> docker login -u nathanvo1489 -p (copy pass in 'jenkins-dockerhub-login')
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${IP_SERVER_RUN_FE}
-                        ls -la
-
-                        cd /home/ubuntu/ToDoList-FE/docker-compose/
-                        docker compose pull js_react_fe
-                        docker compose up -d --force-recreate js_react_fe
-                        docker image prune -f
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${IP_SERVER_RUN_FE} "
+                            ls -la
+                            cd /home/ubuntu/ToDoList-FE/docker-compose/
+                            docker compose pull js_react_fe
+                            docker compose up -d --force-recreate js_react_fe
+                            docker image prune -f
+                        "
                     '''
                 }
             }
