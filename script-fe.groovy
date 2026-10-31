@@ -61,6 +61,7 @@ pipeline {
                             cd /home/ubuntu/ToDoList-FE/docker-compose/
                             docker compose pull js_react_fe
                             docker compose up -d --force-recreate js_react_fe
+                            docker ps
                             docker image prune -f
                         "
                     '''
