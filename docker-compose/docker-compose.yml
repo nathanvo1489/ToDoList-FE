@@ -11,7 +11,7 @@ services:
     ports:
       - 3001:80
     # depends_on:
-    #   - js_react_be
+    #   - js_express_be
 
 
 
