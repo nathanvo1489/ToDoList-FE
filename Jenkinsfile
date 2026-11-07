@@ -68,22 +68,5 @@ pipeline {
                 }
             }
         }
-
-        // stage('Deploy Container') {
-        //     steps {
-        //         sh'''
-        //             docker rm js_react_fe -f || true
-        //             docker run --name js_react_fe -d -p 3001:80 js_react_fe_image
-        //         '''
-        //     }
-        // }
-        
-        // stage('Deploy Container') {
-        //     steps {
-        //         // chuyển image qua bên server run docker save | load
-        //         sh'''
-        //         '''
-        //     }
-        // }
     }
 }

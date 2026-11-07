@@ -1,5 +1,5 @@
 services:
-  # docker run --name js_react_fe_container -d -p 3001:80 js_react_fe_image
+  # docker run --name js_react_fe_container -d -p 3001:80 --env-file=.env js_react_fe_image
   js_react_fe:
     # build:
     #   context: ../frontend
@@ -10,6 +10,7 @@ services:
     restart: unless-stopped
     ports:
       - 3001:80
-
+    env_file:
+      - ../.env
 
 
