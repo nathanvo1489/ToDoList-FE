@@ -7,7 +7,7 @@ discovery.relabel "docker" {
 
     rule {
         source_labels = ["__meta_docker_container_name"]
-        regex        = "/(.+)"
+        regex        = "/(.*)"
         target_label = "container" 
     }
 }
@@ -21,6 +21,6 @@ loki.source.docker "docker" {
 
 loki.write "local" {
     endpoint {
-        url = "http://loki:3100/loki/api/v1/push"
+        url = "http://13.214.188.172:3100/loki/api/v1/push"
     }
 }
